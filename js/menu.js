@@ -9,7 +9,7 @@
 
 import { getAuthToken } from './auth.js';
 
-const API_BASE_URL = 'https://stock-flow-2e23e-default-rtdb.firebaseio.com/menu.json';
+const API_BASE_URL = 'https://stock-flow-72a8a-default-rtdb.firebaseio.com/menu.json';
 
 // Caché de menú privado en el módulo (Sin variables globales)
 let cachedMenuMap = new Map();

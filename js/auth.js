@@ -22,10 +22,10 @@ import {
 
 const firebaseConfig = {
     apiKey: "TU_API_KEY_DE_FIREBASE_CONSOLE",
-    authDomain: "tu-proyecto.firebaseapp.com",
-    databaseURL: "https://tu-proyecto-default-rtdb.firebaseio.com",
-    projectId: "tu-proyecto",
-    storageBucket: "tu-proyecto.appspot.com"
+    authDomain: "stock-flow-72a8a.firebaseapp.com",
+    databaseURL: "https://stock-flow-72a8a-default-rtdb.firebaseio.com",
+    projectId: "stock-flow-72a8a",
+    storageBucket: "stock-flow-72a8a.appspot.com"
 };
 
 const app = initializeApp(firebaseConfig);

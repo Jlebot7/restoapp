@@ -3,7 +3,7 @@
  * Handles communication with Firebase Realtime Database
  */
 
-const API_BASE_URL = 'https://stock-flow-2e23e-default-rtdb.firebaseio.com/menu.json';
+const API_BASE_URL = 'https://stock-flow-72a8a-default-rtdb.firebaseio.com/menu.json';
 
 /**
  * Fetches the current menu items from Firebase.
