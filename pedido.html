@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RestoApp - Módulo de Pedidos para Meseros. Procesamiento de comandas y cálculo de impuesto.">
+    <title>RestoApp - Toma de Pedidos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div id="main-header-placeholder"></div>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h1 class="page-title">Módulo de Pedidos — Mesero</h1>
+            <p class="page-subtitle">Selecciona el plato, la cantidad y procesa el pedido en tiempo real.</p>
+        </header>
+
+        <div class="grid-2">
+            <!-- Formulario de Pedido -->
+            <section class="card" aria-labelledby="form-title">
+                <h2 class="card-title" id="form-title">📝 Datos de la Comanda</h2>
+                
+                <form id="order-form" novalidate>
+                    <div class="form-group">
+                        <label for="dish-select" class="form-label">Seleccionar Plato:</label>
+                        <select id="dish-select" class="form-select" required>
+                            <option value="">-- Cargando catálogo... --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity" class="form-label">Cantidad:</label>
+                        <input type="number" id="quantity" class="form-control" placeholder="Ej. 2" min="1" step="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="unit-price" class="form-label">Precio Unitario ($ COP):</label>
+                        <input type="number" id="unit-price" class="form-control" placeholder="0.00" min="0" step="0.01" required>
+                    </div>
+
+                    <button type="submit" id="btn-process-order" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                        ⚡ PROCESAR PEDIDO
+                    </button>
+                </form>
+            </section>
+
+            <!-- Card de Resumen del Pedido -->
+            <section id="order-summary-box" class="card summary-card" style="display: none;" aria-label="Resumen de la orden">
+                <!-- Se llena dinámicamente desde js/pages/pedido.js -->
+            </section>
+        </div>
+    </main>
+
+    <script type="module" src="js/pages/pedido.js"></script>
+</body>
+</html>
