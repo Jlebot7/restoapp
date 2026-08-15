@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RestoApp - Ejecutor de Pruebas Unitarias</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .test-pass { color: var(--success); font-weight: 600; }
+        .test-fail { color: var(--danger); font-weight: 600; }
+        .test-log { background: #0f172a; color: #38bdf8; padding: 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.9rem; white-space: pre-wrap; margin-top: 1rem; max-height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+    <div id="main-header-placeholder"></div>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h1 class="page-title">🧪 Suite de Pruebas Unitarias & Validación</h1>
+            <p class="page-subtitle">Pruebas automatizadas para verificar cálculos de comanda, IVA y reglas de validación.</p>
+        </header>
+
+        <section class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 class="card-title" style="margin: 0;">Resultados de Ejecución</h2>
+                <button id="btn-run-tests" class="btn btn-primary">🔄 Re-ejecutar Pruebas</button>
+            </div>
+
+            <div class="grid-3" style="margin-bottom: 1.5rem;">
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
+                    <div style="font-size: 0.85rem; color: #047857; font-weight: 600;">PRUEBAS PASADAS</div>
+                    <div id="passed-count" style="font-size: 2rem; font-weight: 700; color: #059669;">0</div>
+                </div>
+
+                <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
+                    <div style="font-size: 0.85rem; color: #b91c1c; font-weight: 600;">PRUEBAS FALLADAS</div>
+                    <div id="failed-count" style="font-size: 2rem; font-weight: 700; color: #dc2626;">0</div>
+                </div>
+
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
+                    <div style="font-size: 0.85rem; color: #1e40af; font-weight: 600;">ESTADO GENERAL</div>
+                    <div id="status-badge" style="font-size: 1.2rem; font-weight: 700; color: #2563eb; margin-top: 0.4rem;">Cargando...</div>
+                </div>
+            </div>
+
+            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Consola de Pruebas:</h3>
+            <div id="test-console" class="test-log">Iniciando ejecutor de pruebas...</div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { initLayout } from '../js/ui.js';
+        import { runAllTests } from './pedidos.test.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initLayout('home');
+            executeTests();
+
+            document.getElementById('btn-run-tests').addEventListener('click', () => {
+                executeTests();
+            });
+        });
+
+        function executeTests() {
+            const consoleEl = document.getElementById('test-console');
+            const passedEl = document.getElementById('passed-count');
+            const failedEl = document.getElementById('failed-count');
+            const statusEl = document.getElementById('status-badge');
+
+            consoleEl.textContent = '';
+            
+            // Intercept console.log to output in browser
+            const originalLog = console.log;
+            const originalError = console.error;
+
+            let logBuffer = '';
+            console.log = function(...args) {
+                logBuffer += args.join(' ') + '\n';
+                originalLog.apply(console, args);
+            };
+            console.error = function(...args) {
+                logBuffer += '❌ ' + args.join(' ') + '\n';
+                originalError.apply(console, args);
+            };
+
+            const results = runAllTests();
+
+            console.log = originalLog;
+            console.error = originalError;
+
+            consoleEl.textContent = logBuffer;
+            passedEl.textContent = results.passed;
+            failedEl.textContent = results.failed;
+
+            if (results.failed === 0) {
+                statusEl.textContent = '✅ TODAS EXITOSAS';
+                statusEl.style.color = 'var(--success)';
+            } else {
+                statusEl.textContent = '❌ FALLOS DETECTADOS';
+                statusEl.style.color = 'var(--danger)';
+            }
+        }
+    </script>
+</body>
+</html>
