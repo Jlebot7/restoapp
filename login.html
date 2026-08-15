@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RestoApp - Inicio de Sesión Seguro para Administración de Restaurante.">
+    <title>RestoApp - Acceso Seguro</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div id="main-header-placeholder"></div>
+
+    <main class="main-content">
+        <div style="max-width: 440px; margin: 3rem auto 0 auto;">
+            <section class="card">
+                <header style="text-align: center; margin-bottom: 1.5rem;">
+                    <h1 class="page-title" style="font-size: 1.5rem;">🔐 Acceso al Sistema</h1>
+                    <p class="page-subtitle" style="font-size: 0.9rem;">Autenticación segura basada en tokens (Firebase Auth).</p>
+                </header>
+
+                <div id="auth-error-msg" style="display: none; background-color: #fef2f2; border-left: 4px solid var(--danger); color: var(--danger); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 1rem;"></div>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Correo Electrónico / Usuario:</label>
+                        <input type="text" id="username" class="form-control" placeholder="admin@restoapp.com" required autocomplete="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Contraseña:</label>
+                        <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" id="btn-login" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                        Ingresar al Sistema
+                    </button>
+                </form>
+
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.8rem; color: var(--text-muted);">
+                    🔒 <strong>Seguridad Aplicada (Ejercicio 3):</strong><br>
+                    Sin credenciales almacenadas en código fuente cliente.<br>
+                    Escritura en Realtime DB protegida por token de sesión.
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="module" src="js/pages/login.js"></script>
+</body>
+</html>
