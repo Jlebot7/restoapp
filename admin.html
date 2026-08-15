@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RestoApp - Panel de Administración para gestión del catálogo de menú y alta de productos.">
+    <title>RestoApp - Panel de Administración</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div id="main-header-placeholder"></div>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h1 class="page-title">⚙️ Panel de Administración</h1>
+            <p class="page-subtitle">Gestión en tiempo real del menú y productos de RestoApp.</p>
+        </header>
+
+        <div class="grid-2">
+            <!-- Formulario de Crear Producto -->
+            <section class="card" aria-labelledby="create-title">
+                <h2 class="card-title" id="create-title">➕ Crear Nuevo Producto</h2>
+                
+                <form id="create-product-form" novalidate>
+                    <div class="form-group">
+                        <label for="new-product-name" class="form-label">Nombre del Producto / Plato:</label>
+                        <input type="text" id="new-product-name" class="form-control" placeholder="Ej. Hamburguesa Especial" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new-product-price" class="form-label">Precio ($ COP):</label>
+                        <input type="number" id="new-product-price" class="form-control" placeholder="Ej. 18500" min="1" step="100" required>
+                    </div>
+
+                    <button type="submit" id="btn-create-product" class="btn btn-success btn-block" style="margin-top: 1rem;">
+                        Guardar Producto en Firebase
+                    </button>
+                </form>
+            </section>
+
+            <!-- Lista / Catálogo de Productos Registrados -->
+            <section class="card" aria-labelledby="catalog-title">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="card-title" id="catalog-title" style="margin-bottom: 0;">📋 Catálogo Actual</h2>
+                    <span class="brand-badge" id="product-count" style="background-color: var(--secondary);">0</span>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="data-table" aria-label="Tabla de catálogo de productos">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body">
+                            <!-- Filas generadas desde js/pages/admin.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="module" src="js/pages/admin.js"></script>
+</body>
+</html>
