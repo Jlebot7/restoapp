@@ -2,7 +2,7 @@
   "rules": {
     "menu": {
       ".read": true,
-      ".write": "auth != null",
+      ".write": true,
       "$item_id": {
         ".validate": "newData.hasChildren(['name', 'price']) && newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('price').isNumber() && newData.child('price').val() > 0"
       }
