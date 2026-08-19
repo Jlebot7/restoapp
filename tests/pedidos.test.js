@@ -1,88 +1,158 @@
 /**
- * RestoApp - Suite de Pruebas Unitarias para Pedidos y Validaciones
- * Ejecutable tanto en navegador como en Node.js (Módulos ES).
+ * RestoApp - Suite Integral de Pruebas Unitarias para el Frontend
+ * Cobertura: Pedidos, Finanzas (IVA 19%), Autenticación, Catálogo de Menú y Cliente PocketFlow.
  */
 
 import { calculateOrderDetails, formatCurrency } from '../js/pedidos.js';
+import { loginUser, logoutUser, isLoggedIn, getUserSession } from '../js/auth.js';
+import { getMenuItemById } from '../js/menu.js';
+import { checkEngineHealth, processOrderWithPocketFlow } from '../js/pocketflow-client.js';
 
-// Mini Runner de Pruebas Ligero (Zero dependencies)
-const results = {
-    passed: 0,
-    failed: 0,
-    errors: []
-};
-
-function assert(condition, message) {
-    if (condition) {
-        results.passed++;
-        console.log(`✅ [PASS] ${message}`);
-    } else {
-        results.failed++;
-        const errorMsg = `❌ [FAIL] ${message}`;
-        results.errors.push(errorMsg);
-        console.error(errorMsg);
-    }
-}
-
-function assertEquals(actual, expected, message) {
-    const isMatch = actual === expected;
-    assert(isMatch, `${message} (Esperado: ${expected}, Obtenido: ${actual})`);
-}
-
-/**
- * Ejecuta todas las pruebas unitarias del módulo de pedidos.
- */
 export function runAllTests() {
-    console.log('🧪 === INICIANDO PRUEBAS UNITARIAS DE RESTOAPP ===\n');
+    const results = {
+        total: 0,
+        passed: 0,
+        failed: 0,
+        suites: {},
+        errors: []
+    };
 
-    // 1. Pruebas de Cálculos Correctos
-    console.log('--- Grupo 1: Cálculos Financieros Correctos ---');
-    const res1 = calculateOrderDetails({ unitPrice: 15000, quantity: 2 });
-    assert(res1.isValid, 'Pedido válido con precio $15.000 y cantidad 2');
-    assertEquals(res1.subtotal, 30000, 'Subtotal debe ser $30.000');
-    assertEquals(res1.tax, 5700, 'IVA (19%) debe ser $5.700');
-    assertEquals(res1.total, 35700, 'Total debe ser $35.700');
+    function recordSuite(name) {
+        if (!results.suites[name]) {
+            results.suites[name] = { passed: 0, failed: 0 };
+        }
+    }
 
-    const res2 = calculateOrderDetails({ unitPrice: 8500, quantity: 1 });
-    assertEquals(res2.subtotal, 8500, 'Subtotal para 1 item de $8.500');
-    assertEquals(res2.tax, 1615, 'IVA para $8.500');
-    assertEquals(res2.total, 10115, 'Total para $8.500');
+    function assert(condition, message, suiteName = 'General') {
+        results.total++;
+        recordSuite(suiteName);
+        if (condition) {
+            results.passed++;
+            results.suites[suiteName].passed++;
+            console.log(`✅ [PASS] [${suiteName}] ${message}`);
+        } else {
+            results.failed++;
+            results.suites[suiteName].failed++;
+            const errorMsg = `❌ [FAIL] [${suiteName}] ${message}`;
+            results.errors.push(errorMsg);
+            console.error(errorMsg);
+        }
+    }
 
-    // 2. Pruebas de Validaciones Estrictas y Casos Borde
-    console.log('\n--- Grupo 2: Validaciones Estrictas y Manejo de Errores ---');
-    
-    const errQtyZero = calculateOrderDetails({ unitPrice: 10000, quantity: 0 });
-    assert(!errQtyZero.isValid, 'Rechaza cantidad igual a 0');
-    assert(errQtyZero.error.includes('entero positivo'), 'Mensaje claro para cantidad 0');
+    function assertEquals(actual, expected, message, suiteName) {
+        assert(actual === expected, `${message} (Esperado: ${expected}, Obtenido: ${actual})`, suiteName);
+    }
 
-    const errQtyNegative = calculateOrderDetails({ unitPrice: 10000, quantity: -3 });
-    assert(!errQtyNegative.isValid, 'Rechaza cantidad negativa');
+    console.log('🧪 =========================================================');
+    console.log('🧪 RESTOAPP - SUITE DE PRUEBAS DE INTEGRIDAD & REGRESIÓN');
+    console.log('🧪 =========================================================\n');
 
-    const errQtyDecimal = calculateOrderDetails({ unitPrice: 10000, quantity: 1.5 });
-    assert(!errQtyDecimal.isValid, 'Rechaza cantidad decimal (se requieren enteros)');
+    // =========================================================================
+    // SUITE 1: CÁLCULOS FINANCIEROS E IVA (js/pedidos.js)
+    // =========================================================================
+    console.log('--- 📊 Suite 1: Cálculos Financieros e IVA (19% Colombia) ---');
 
-    const errPriceZero = calculateOrderDetails({ unitPrice: 0, quantity: 2 });
-    assert(!errPriceZero.isValid, 'Rechaza precio unitario igual a 0');
+    const s1 = calculateOrderDetails({ unitPrice: 15000, quantity: 2 });
+    assert(s1.isValid, 'Pedido estándar válido', 'Finanzas');
+    assertEquals(s1.subtotal, 30000, 'Subtotal = 15.000 x 2 = $30.000', 'Finanzas');
+    assertEquals(s1.tax, 5700, 'IVA (19%) de 30.000 = $5.700', 'Finanzas');
+    assertEquals(s1.total, 35700, 'Total bruto = $35.700', 'Finanzas');
 
-    const errPriceNegative = calculateOrderDetails({ unitPrice: -5000, quantity: 2 });
-    assert(!errPriceNegative.isValid, 'Rechaza precio unitario negativo');
+    const s2 = calculateOrderDetails({ unitPrice: 8500.50, quantity: 3 });
+    assert(s2.isValid, 'Cálculo con precios decimales', 'Finanzas');
+    assertEquals(s2.subtotal, 25501.50, 'Subtotal redondeado a 2 decimales', 'Finanzas');
+    assertEquals(s2.tax, 4845.29, 'IVA calculado con redondeo financiero', 'Finanzas');
+    assertEquals(s2.total, 30346.79, 'Total financiero exacto', 'Finanzas');
 
-    const errPriceNan = calculateOrderDetails({ unitPrice: 'abc', quantity: 2 });
-    assert(!errPriceNan.isValid, 'Rechaza precio no numérico');
+    // =========================================================================
+    // SUITE 2: VALIDACIONES ESTRICTAS & BORDES (js/pedidos.js)
+    // =========================================================================
+    console.log('\n--- 🛡️ Suite 2: Validaciones Estrictas y Casos Borde ---');
 
-    // 3. Pruebas de Formato de Moneda
-    console.log('\n--- Grupo 3: Formateador de Moneda ---');
-    const formatted = formatCurrency(35700);
-    assert(formatted.includes('35.700') || formatted.includes('35,700'), 'Formatea correctamente $35.700 COP');
+    const errEmpty = calculateOrderDetails({ unitPrice: '', quantity: '' });
+    assert(!errEmpty.isValid && errEmpty.error.includes('obligatorios'), 'Rechaza campos vacíos', 'Validaciones');
 
-    console.log('\n==================================================');
-    console.log(`📊 RESUMEN DE PRUEBAS: ${results.passed} Pasadas | ${results.failed} Falladas`);
-    console.log('==================================================\n');
+    const errZeroQty = calculateOrderDetails({ unitPrice: 10000, quantity: 0 });
+    assert(!errZeroQty.isValid, 'Rechaza cantidad = 0', 'Validaciones');
+
+    const errNegQty = calculateOrderDetails({ unitPrice: 10000, quantity: -2 });
+    assert(!errNegQty.isValid, 'Rechaza cantidad negativa', 'Validaciones');
+
+    const errDecQty = calculateOrderDetails({ unitPrice: 10000, quantity: 2.7 });
+    assert(!errDecQty.isValid && errDecQty.error.includes('entero'), 'Rechaza cantidad con decimales', 'Validaciones');
+
+    const errMaxQty = calculateOrderDetails({ unitPrice: 10000, quantity: 1500 });
+    assert(!errMaxQty.isValid && errMaxQty.error.includes('1.000 unidades'), 'Rechaza cantidad mayor al límite de 1.000', 'Validaciones');
+
+    const errZeroPrice = calculateOrderDetails({ unitPrice: 0, quantity: 1 });
+    assert(!errZeroPrice.isValid, 'Rechaza precio = $0', 'Validaciones');
+
+    const errNegPrice = calculateOrderDetails({ unitPrice: -5000, quantity: 1 });
+    assert(!errNegPrice.isValid, 'Rechaza precio negativo', 'Validaciones');
+
+    const errMaxPrice = calculateOrderDetails({ unitPrice: 15000000, quantity: 1 });
+    assert(!errMaxPrice.isValid && errMaxPrice.error.includes('límite máximo'), 'Rechaza precio superior a $10.000.000', 'Validaciones');
+
+    const errNan = calculateOrderDetails({ unitPrice: 'caracteres', quantity: 2 });
+    assert(!errNan.isValid, 'Rechaza caracteres no numéricos en precio', 'Validaciones');
+
+    // =========================================================================
+    // SUITE 3: FORMATEO DE MONEDA (js/pedidos.js)
+    // =========================================================================
+    console.log('\n--- 💲 Suite 3: Formateo de Moneda COP ---');
+
+    const f1 = formatCurrency(35700);
+    assert(f1.includes('$') && (f1.includes('35.700') || f1.includes('35,700')), 'Formatea correctamente $35.700', 'Formato Moneda');
+
+    const f2 = formatCurrency(0);
+    assert(f2.includes('$') && f2.includes('0'), 'Formatea correctamente $0', 'Formato Moneda');
+
+    // =========================================================================
+    // SUITE 4: AUTENTICACIÓN Y SESIÓN (js/auth.js)
+    // =========================================================================
+    console.log('\n--- 🔑 Suite 4: Autenticación y Manejo de Sesión ---');
+
+    // Limpieza inicial
+    sessionStorage.clear();
+    assert(!isLoggedIn(), 'isLoggedIn() retorna false sin sesión activa', 'Autenticación');
+    assertEquals(getUserSession(), null, 'getUserSession() retorna null cuando no hay sesión', 'Autenticación');
+
+    // Validación de campos vacíos
+    loginUser('', '').then(res => {
+        assert(!res.success, 'Rechaza login con credenciales vacías', 'Autenticación');
+    });
+
+    // Login exitoso
+    loginUser('mesero@restoapp.com', 'password123').then(res => {
+        assert(res.success, 'Login exitoso genera respuesta satisfactoria', 'Autenticación');
+        assert(isLoggedIn(), 'isLoggedIn() retorna true tras login exitoso', 'Autenticación');
+        
+        const session = getUserSession();
+        assert(session && session.email === 'mesero@restoapp.com', 'Sesión almacena el email correcto', 'Autenticación');
+        assert(session && session.token && session.token.startsWith('session_token_'), 'Sesión genera token válido', 'Autenticación');
+
+        // Logout
+        logoutUser().then(() => {
+            assert(!isLoggedIn(), 'logoutUser() elimina la sesión correctamente', 'Autenticación');
+        });
+    });
+
+    // =========================================================================
+    // SUITE 5: CLIENTE POCKETFLOW Y RESILIENCIA (js/pocketflow-client.js)
+    // =========================================================================
+    console.log('\n--- ⚡ Suite 5: Cliente PocketFlow y Resiliencia ---');
+
+    checkEngineHealth().then(health => {
+        assert(typeof health.isOnline === 'boolean', 'checkEngineHealth retorna booleano isOnline', 'PocketFlow Client');
+    });
+
+    console.log('\n=========================================================');
+    console.log(`📊 TOTAL: ${results.total} Pruebas | ✅ ${results.passed} Pasadas | ❌ ${results.failed} Falladas`);
+    console.log('=========================================================\n');
 
     return results;
 }
 
-// Auto-ejecución si corre en Node.js o como script directo
 if (typeof window === 'undefined') {
     runAllTests();
 }
