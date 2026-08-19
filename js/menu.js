@@ -50,13 +50,47 @@ export function getMenuItemById(id) {
 }
 
 /**
+ * Valida que un precio cumpla con las reglas de negocio.
+ * @param {any} price 
+ * @returns {{isValid: boolean, price?: number, error?: string}}
+ */
+export function validateProductPrice(price) {
+    if (price === undefined || price === null || String(price).trim() === '') {
+        return { isValid: false, error: 'El precio es un campo obligatorio.' };
+    }
+
+    const num = Number(price);
+    if (isNaN(num) || !isFinite(num)) {
+        return { isValid: false, error: 'El precio debe ser un número válido.' };
+    }
+
+    if (num <= 0) {
+        return { isValid: false, error: 'El precio debe ser mayor a $0.' };
+    }
+
+    if (num > 10000000) {
+        return { isValid: false, error: 'El precio no puede exceder el límite de seguridad ($10.000.000 COP).' };
+    }
+
+    return {
+        isValid: true,
+        price: Math.round(num * 100) / 100
+    };
+}
+
+/**
  * Crea un nuevo producto en Firebase Realtime DB.
  * @param {{ name: string, price: number }} newItem
  * @returns {Promise<Object>}
  */
 export async function createMenuItem(newItem) {
-    if (!newItem || !newItem.name || typeof newItem.price !== 'number' || newItem.price <= 0) {
-        throw new Error('Datos de producto inválidos. Nombre obligatorio y precio mayor a $0.');
+    if (!newItem || !newItem.name || typeof newItem.name !== 'string' || !newItem.name.trim()) {
+        throw new Error('El nombre del producto es obligatorio.');
+    }
+
+    const priceValidation = validateProductPrice(newItem.price);
+    if (!priceValidation.isValid) {
+        throw new Error(priceValidation.error);
     }
 
     try {
@@ -65,7 +99,7 @@ export async function createMenuItem(newItem) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: newItem.name.trim(),
-                price: newItem.price
+                price: priceValidation.price
             })
         });
 
@@ -79,6 +113,57 @@ export async function createMenuItem(newItem) {
         return await response.json();
     } catch (error) {
         console.error('[Menu] Error al guardar producto:', error);
+        throw error;
+    }
+}
+
+/**
+ * Actualiza el precio de un producto existente en Firebase Realtime DB.
+ * @param {string} id - Identificador del producto
+ * @param {number|string} newPrice - Nuevo valor de precio
+ * @returns {Promise<{success: boolean, id: string, price: number}>}
+ */
+export async function updateMenuItemPrice(id, newPrice) {
+    if (!id || typeof id !== 'string' && typeof id !== 'number') {
+        throw new Error('El identificador del producto es obligatorio.');
+    }
+
+    const validation = validateProductPrice(newPrice);
+    if (!validation.isValid) {
+        throw new Error(validation.error);
+    }
+
+    const targetUrl = `https://stock-flow-72a8a-default-rtdb.firebaseio.com/menu/${encodeURIComponent(id)}.json`;
+
+    try {
+        const response = await fetch(targetUrl, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                price: validation.price
+            })
+        });
+
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                throw new Error('No autorizado para modificar precios en Firebase.');
+            }
+            throw new Error(`Error del servidor al actualizar precio (HTTP ${response.status})`);
+        }
+
+        // Actualizar caché local
+        if (cachedMenuMap.has(String(id))) {
+            const cachedItem = cachedMenuMap.get(String(id));
+            cachedItem.price = validation.price;
+        }
+
+        return {
+            success: true,
+            id: String(id),
+            price: validation.price
+        };
+    } catch (error) {
+        console.error(`[Menu] Error al actualizar precio del plato ${id}:`, error);
         throw error;
     }
 }

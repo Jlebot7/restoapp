@@ -5,7 +5,7 @@
 
 import { calculateOrderDetails, formatCurrency } from '../js/pedidos.js';
 import { loginUser, logoutUser, isLoggedIn, getUserSession } from '../js/auth.js';
-import { getMenuItemById } from '../js/menu.js';
+import { getMenuItemById, validateProductPrice } from '../js/menu.js';
 import { checkEngineHealth, processOrderWithPocketFlow } from '../js/pocketflow-client.js';
 
 export function runAllTests() {
@@ -138,9 +138,35 @@ export function runAllTests() {
     });
 
     // =========================================================================
-    // SUITE 5: CLIENTE POCKETFLOW Y RESILIENCIA (js/pocketflow-client.js)
+    // SUITE 5: VALIDACIÓN DE PRECIOS DEL CATÁLOGO (js/menu.js)
     // =========================================================================
-    console.log('\n--- ⚡ Suite 5: Cliente PocketFlow y Resiliencia ---');
+    console.log('\n--- 🏷️ Suite 5: Validación de Precios del Catálogo ---');
+
+    const vp1 = validateProductPrice(25000);
+    assert(vp1.isValid && vp1.price === 25000, 'Acepta precio entero válido ($25.000)', 'Catálogo & Precios');
+
+    const vp2 = validateProductPrice('18500.50');
+    assert(vp2.isValid && vp2.price === 18500.50, 'Acepta y castea precio string decimal ($18.500,50)', 'Catálogo & Precios');
+
+    const vpEmpty = validateProductPrice('');
+    assert(!vpEmpty.isValid && vpEmpty.error.includes('obligatorio'), 'Rechaza precio vacío al editar', 'Catálogo & Precios');
+
+    const vpZero = validateProductPrice(0);
+    assert(!vpZero.isValid && vpZero.error.includes('mayor a $0'), 'Rechaza precio = $0 al editar', 'Catálogo & Precios');
+
+    const vpNeg = validateProductPrice(-1500);
+    assert(!vpNeg.isValid, 'Rechaza precio negativo al editar', 'Catálogo & Precios');
+
+    const vpMax = validateProductPrice(20000000);
+    assert(!vpMax.isValid && vpMax.error.includes('límite de seguridad'), 'Rechaza precio superior a $10.000.000', 'Catálogo & Precios');
+
+    const vpNan = validateProductPrice('abc');
+    assert(!vpNan.isValid && vpNan.error.includes('número válido'), 'Rechaza precio alfanumérico', 'Catálogo & Precios');
+
+    // =========================================================================
+    // SUITE 6: CLIENTE POCKETFLOW Y RESILIENCIA (js/pocketflow-client.js)
+    // =========================================================================
+    console.log('\n--- ⚡ Suite 6: Cliente PocketFlow y Resiliencia ---');
 
     checkEngineHealth().then(health => {
         assert(typeof health.isOnline === 'boolean', 'checkEngineHealth retorna booleano isOnline', 'PocketFlow Client');
