@@ -3,12 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RestoApp - Ejecutor de Pruebas Unitarias</title>
+    <title>RestoApp - Suite de Pruebas & Verificación de Integridad</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
         .test-pass { color: var(--success); font-weight: 600; }
         .test-fail { color: var(--danger); font-weight: 600; }
-        .test-log { background: #0f172a; color: #38bdf8; padding: 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.9rem; white-space: pre-wrap; margin-top: 1rem; max-height: 400px; overflow-y: auto; }
+        .test-log {
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 1.2rem;
+            border-radius: var(--radius-md);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.88rem;
+            white-space: pre-wrap;
+            margin-top: 1rem;
+            max-height: 450px;
+            overflow-y: auto;
+            border: 1px solid #334155;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .suite-pill {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.4rem;
+        }
+        .suite-pill.ok { background: #dcfce7; color: #15803d; }
+        .suite-pill.fail { background: #fee2e2; color: #b91c1c; }
+        .suite-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all var(--transition-fast);
+        }
+        .suite-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
     </style>
 </head>
 <body>
@@ -17,34 +52,48 @@
 
     <main class="main-content">
         <header class="page-header">
-            <h1 class="page-title">🧪 Suite de Pruebas Unitarias & Validación</h1>
-            <p class="page-subtitle">Pruebas automatizadas para verificar cálculos de comanda, IVA y reglas de validación.</p>
+            <h1 class="page-title">🧪 Suite de Pruebas & Verificación de Integridad</h1>
+            <p class="page-subtitle">Monitoreo de regresión, reglas de negocio, motor PocketFlow y robustez del sistema.</p>
         </header>
 
         <section class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2 class="card-title" style="margin: 0;">Resultados de Ejecución</h2>
-                <button id="btn-run-tests" class="btn btn-primary">🔄 Re-ejecutar Pruebas</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 class="card-title" style="margin: 0;">Panel de Diagnóstico</h2>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
+                        Ejecuta validaciones automáticas sobre frontend, finanzas y conectividad backend.
+                    </p>
+                </div>
+                <button id="btn-run-tests" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                    🔄 Re-ejecutar Pruebas
+                </button>
             </div>
 
             <div class="grid-3" style="margin-bottom: 1.5rem;">
-                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
-                    <div style="font-size: 0.85rem; color: #047857; font-weight: 600;">PRUEBAS PASADAS</div>
-                    <div id="passed-count" style="font-size: 2rem; font-weight: 700; color: #059669;">0</div>
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1.25rem; border-radius: var(--radius-md); text-align: center;">
+                    <div style="font-size: 0.85rem; color: #047857; font-weight: 600;">PRUEBAS EXITOSAS</div>
+                    <div id="passed-count" style="font-size: 2.2rem; font-weight: 700; color: #059669;">0</div>
                 </div>
 
-                <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
-                    <div style="font-size: 0.85rem; color: #b91c1c; font-weight: 600;">PRUEBAS FALLADAS</div>
-                    <div id="failed-count" style="font-size: 2rem; font-weight: 700; color: #dc2626;">0</div>
+                <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 1.25rem; border-radius: var(--radius-md); text-align: center;">
+                    <div style="font-size: 0.85rem; color: #b91c1c; font-weight: 600;">PRUEBAS FALLIDAS</div>
+                    <div id="failed-count" style="font-size: 2.2rem; font-weight: 700; color: #dc2626;">0</div>
                 </div>
 
-                <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
-                    <div style="font-size: 0.85rem; color: #1e40af; font-weight: 600;">ESTADO GENERAL</div>
-                    <div id="status-badge" style="font-size: 1.2rem; font-weight: 700; color: #2563eb; margin-top: 0.4rem;">Cargando...</div>
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 1.25rem; border-radius: var(--radius-md); text-align: center;">
+                    <div style="font-size: 0.85rem; color: #1e40af; font-weight: 600;">INTEGRIDAD GENERAL</div>
+                    <div id="status-badge" style="font-size: 1.15rem; font-weight: 700; color: #2563eb; margin-top: 0.4rem;">Cargando...</div>
                 </div>
             </div>
 
-            <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Consola de Pruebas:</h3>
+            <div id="suites-overview" style="margin-bottom: 1.5rem;">
+                <!-- Cobertura por Suites -->
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <h3 style="font-size: 1rem; font-weight: 600; margin: 0;">Consola de Salida de Pruebas:</h3>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Formato: [Módulo] Aserción</span>
+            </div>
             <div id="test-console" class="test-log">Iniciando ejecutor de pruebas...</div>
         </section>
     </main>
@@ -67,10 +116,10 @@
             const passedEl = document.getElementById('passed-count');
             const failedEl = document.getElementById('failed-count');
             const statusEl = document.getElementById('status-badge');
+            const suitesOverviewEl = document.getElementById('suites-overview');
 
             consoleEl.textContent = '';
             
-            // Intercept console.log to output in browser
             const originalLog = console.log;
             const originalError = console.error;
 
@@ -93,11 +142,30 @@
             passedEl.textContent = results.passed;
             failedEl.textContent = results.failed;
 
+            // Renderizar resumen de suites
+            let suitesHtml = '<h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem;">Módulos Auditados:</h3><div class="grid-2">';
+            Object.keys(results.suites).forEach(suiteName => {
+                const s = results.suites[suiteName];
+                const isAllPass = s.failed === 0;
+                suitesHtml += `
+                    <div class="suite-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong>📦 ${suiteName}</strong>
+                            <span class="suite-pill ${isAllPass ? 'ok' : 'fail'}">
+                                ${isAllPass ? '✔ PASS' : `✖ ${s.failed} FALLOS`} (${s.passed}/${s.passed + s.failed})
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+            suitesHtml += '</div>';
+            suitesOverviewEl.innerHTML = suitesHtml;
+
             if (results.failed === 0) {
-                statusEl.textContent = '✅ TODAS EXITOSAS';
+                statusEl.textContent = '✅ 100% SALUDABLE';
                 statusEl.style.color = 'var(--success)';
             } else {
-                statusEl.textContent = '❌ FALLOS DETECTADOS';
+                statusEl.textContent = `❌ ${results.failed} FALLO(S)`;
                 statusEl.style.color = 'var(--danger)';
             }
         }
