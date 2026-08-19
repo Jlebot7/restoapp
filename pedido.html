@@ -3,9 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="RestoApp - Módulo de Pedidos para Meseros. Procesamiento de comandas y cálculo de impuesto.">
+    <meta name="description" content="RestoApp - Módulo de Pedidos para Meseros con Motor PocketFlow Planner-Critic.">
     <title>RestoApp - Toma de Pedidos</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .engine-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .engine-badge.online {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .engine-badge.offline {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        .engine-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .engine-badge.online .engine-dot {
+            background-color: #22c55e;
+            box-shadow: 0 0 8px #22c55e;
+        }
+        .engine-badge.offline .engine-dot {
+            background-color: #f59e0b;
+        }
+        .pipeline-card {
+            margin-top: 1rem;
+            padding: 0.85rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+        }
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.35rem;
+            color: #334155;
+        }
+        .step-icon {
+            font-weight: bold;
+        }
+        .step-icon.ok { color: #16a34a; }
+        .step-icon.critic { color: #2563eb; }
+    </style>
 </head>
 <body>
 
@@ -14,7 +70,13 @@
     <main class="main-content">
         <header class="page-header">
             <h1 class="page-title">Módulo de Pedidos — Mesero</h1>
-            <p class="page-subtitle">Selecciona el plato, la cantidad y procesa el pedido en tiempo real.</p>
+            <p class="page-subtitle">Procesamiento de comandas y validación en tiempo real con motor <strong>PocketFlow</strong>.</p>
+            <div id="pocketflow-status-container">
+                <span id="pocketflow-badge" class="engine-badge offline">
+                    <span class="engine-dot"></span>
+                    <span id="pocketflow-status-text">Verificando motor PocketFlow...</span>
+                </span>
+            </div>
         </header>
 
         <div class="grid-2">
@@ -41,7 +103,7 @@
                     </div>
 
                     <button type="submit" id="btn-process-order" class="btn btn-primary btn-block" style="margin-top: 1rem;">
-                        ⚡ PROCESAR PEDIDO
+                        ⚡ PROCESAR PEDIDO CON POCKETFLOW
                     </button>
                 </form>
             </section>
