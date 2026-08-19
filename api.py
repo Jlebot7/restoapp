@@ -131,6 +131,41 @@ def procesar_pedido(order: OrderRequest):
     )
 
 
+# =====================================================================
+# SERVICIO DE ARCHIVOS ESTÁTICOS Y PÁGINAS HTML (Evita 404 en servidor)
+# =====================================================================
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Montar directorios de recursos
+if os.path.exists(os.path.join(BASE_DIR, "css")):
+    app.mount("/css", StaticFiles(directory=os.path.join(BASE_DIR, "css")), name="css")
+if os.path.exists(os.path.join(BASE_DIR, "js")):
+    app.mount("/js", StaticFiles(directory=os.path.join(BASE_DIR, "js")), name="js")
+if os.path.exists(os.path.join(BASE_DIR, "tests")):
+    app.mount("/tests", StaticFiles(directory=os.path.join(BASE_DIR, "tests")), name="tests")
+
+# Rutas explícitas para las páginas de la aplicación
+@app.get("/index.html")
+def serve_index():
+    return FileResponse(os.path.join(BASE_DIR, "index.html"))
+
+@app.get("/pedido.html")
+def serve_pedido():
+    return FileResponse(os.path.join(BASE_DIR, "pedido.html"))
+
+@app.get("/admin.html")
+def serve_admin():
+    return FileResponse(os.path.join(BASE_DIR, "admin.html"))
+
+@app.get("/login.html")
+def serve_login():
+    return FileResponse(os.path.join(BASE_DIR, "login.html"))
+
+
 if __name__ == "__main__":
     import uvicorn
     print("Iniciando RestoApp PocketFlow API en http://127.0.0.1:8000 ...")
