@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initLayout('login');
 
     if (isLoggedIn()) {
-        window.location.href = 'admin.html';
+        const isSubdir = window.location.pathname.includes('/tests/') || window.location.href.includes('/tests/');
+        const prefix = isSubdir ? '../' : '';
+        window.location.href = `${prefix}admin.html`;
         return;
     }
 
@@ -44,10 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('¡Autenticado con éxito!', 'success');
                 
                 const urlParams = new URLSearchParams(window.location.search);
-                const redirect = urlParams.get('redirect') || 'admin';
+                let redirect = (urlParams.get('redirect') || 'admin').trim();
                 
+                // Normalizar destino para evitar dobles extensiones (.html.html)
+                if (!redirect.endsWith('.html')) {
+                    redirect = `${redirect}.html`;
+                }
+
+                const isSubdir = window.location.pathname.includes('/tests/') || window.location.href.includes('/tests/');
+                const prefix = isSubdir ? '../' : '';
+
                 setTimeout(() => {
-                    window.location.href = `${redirect}.html`;
+                    window.location.href = `${prefix}${redirect}`;
                 }, 600);
             } else {
                 authErrorMsg.textContent = result.error || 'Credenciales inválidas.';
