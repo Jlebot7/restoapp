@@ -31,22 +31,26 @@ function renderHeader(activePage) {
     const userSession = getUserSession();
     const authenticated = Boolean(userSession);
 
+    // Determinar si la página actual está dentro de una subcarpeta (ej. tests/)
+    const isSubdir = window.location.pathname.includes('/tests/') || window.location.href.includes('/tests/');
+    const prefix = isSubdir ? '../' : '';
+
     header.innerHTML = `
         <div class="header-container">
-            <a href="index.html" class="brand-logo">
+            <a href="${prefix}index.html" class="brand-logo">
                 RestoApp <span class="brand-badge">Secured v3.0</span>
             </a>
             <nav class="main-nav">
-                <a href="index.html" class="nav-link ${activePage === 'home' ? 'active' : ''}">Inicio</a>
-                <a href="pedido.html" class="nav-link ${activePage === 'pedido' ? 'active' : ''}">Mesero (Pedidos)</a>
-                ${authenticated ? `<a href="admin.html" class="nav-link ${activePage === 'admin' ? 'active' : ''}">Administración</a>` : ''}
+                <a href="${prefix}index.html" class="nav-link ${activePage === 'home' ? 'active' : ''}">Inicio</a>
+                <a href="${prefix}pedido.html" class="nav-link ${activePage === 'pedido' ? 'active' : ''}">Mesero (Pedidos)</a>
+                ${authenticated ? `<a href="${prefix}admin.html" class="nav-link ${activePage === 'admin' ? 'active' : ''}">Administración</a>` : ''}
             </nav>
             <div class="nav-auth-status">
                 ${authenticated ? `
                     <span class="user-badge" title="${userSession.email}">👤 ${userSession.email.split('@')[0]}</span>
                     <button id="btn-logout" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">Salir</button>
                 ` : `
-                    <a href="login.html" class="btn btn-primary ${activePage === 'login' ? 'active' : ''}" style="padding: 0.35rem 0.85rem; font-size: 0.85rem;">Ingresar</a>
+                    <a href="${prefix}login.html" class="btn btn-primary ${activePage === 'login' ? 'active' : ''}" style="padding: 0.35rem 0.85rem; font-size: 0.85rem;">Ingresar</a>
                 `}
             </div>
         </div>
@@ -58,7 +62,7 @@ function renderHeader(activePage) {
             await logoutUser();
             showToast('Sesión cerrada de forma segura', 'info');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = `${prefix}index.html`;
             }, 600);
         });
     }
