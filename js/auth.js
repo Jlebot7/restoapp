@@ -80,6 +80,8 @@ export function getAuthToken() {
  */
 export function requireAuthentication() {
     if (!isLoggedIn()) {
-        window.location.href = 'login.html?redirect=admin';
+        const isSubdir = window.location.pathname.includes('/tests/') || window.location.href.includes('/tests/');
+        const prefix = isSubdir ? '../' : '';
+        window.location.href = `${prefix}login.html?redirect=admin`;
     }
 }
