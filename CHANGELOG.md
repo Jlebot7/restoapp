@@ -14,6 +14,26 @@ Este documento detalla la transformación completa de **RestoApp** desde una arq
   - [`login.html`](login.html): Pantalla de autenticación desacoplada con manejo de sesión.
   - [`admin.html`](admin.html): Panel de administración protegido para agregar y listar productos del menú.
 
+### 6. Integración del Motor PocketFlow (Backend & Planner-Critic Architecture)
+- **Motor de Orquestación ([`app.py`](app.py)):** Pipeline declarativo de grafos con PocketFlow (`StockNode >> TaxAndPricingNode >> AuditCriticNode >> OrderSummaryNode`) con manejo explícito de fallos y auditoría de seguridad para comandas.
+- **API REST con FastAPI ([`api.py`](api.py)):** Exposición de endpoints de procesamiento (`POST /api/pedidos/procesar`) y monitoreo de salud (`GET /api/health`).
+- **Integración en Cliente Web ([`js/pocketflow-client.js`](js/pocketflow-client.js) y [`js/pages/pedido.js`](js/pages/pedido.js)):** Envío de comandas con retroalimentación visual del grafo en tiempo real y soporte offline por fallback.
+- **Pruebas Automatizadas ([`tests/test_pocketflow_flow.py`](tests/test_pocketflow_flow.py)):** Suite de pruebas unitarias para nodos, cálculo de IVA (19%), control de límites de stock y auditoría de integridad.
+
+---
+
+## 🛠️ Cómo Ejecutar el Proyecto
+
+### Modo 1: Frontend Estático (Navegador)
+1. Abrir `index.html` o `pedido.html` directamente en el navegador.
+
+### Modo 2: Con Backend PocketFlow Habilitado
+1. Instalar dependencias: `pip install -r requirements.txt`
+2. Iniciar la API REST: `python api.py` (o `uvicorn api:app --reload`)
+3. Abrir `pedido.html` en el navegador para disfrutar de la auditoría y orquestación en tiempo real.
+
+---
+
 ### 2. Sistema de Diseño Unificado y CSS (`css/styles.css`)
 - **Antes:** Estilos incrustados en la etiqueta `<style>` con clases redundantes (`.clase_redundante_que_no_se_usa`) e IDs directos.
 - **Ahora:** Archivo unificado [`css/styles.css`](css/styles.css) utilizando variables CSS (custom properties), fuentes modernas de Google Fonts (*Inter*), tarjetas responsivas, tablas estilizadas, estados hover/active claros y un sistema de notificaciones flotantes (Toasts).
