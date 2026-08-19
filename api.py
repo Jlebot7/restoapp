@@ -148,20 +148,24 @@ if os.path.exists(os.path.join(BASE_DIR, "js")):
 if os.path.exists(os.path.join(BASE_DIR, "tests")):
     app.mount("/tests", StaticFiles(directory=os.path.join(BASE_DIR, "tests")), name="tests")
 
-# Rutas explícitas para las páginas de la aplicación
+# Rutas explícitas para las páginas de la aplicación (con y sin .html)
 @app.get("/index.html")
+@app.get("/index")
 def serve_index():
     return FileResponse(os.path.join(BASE_DIR, "index.html"))
 
 @app.get("/pedido.html")
+@app.get("/pedido")
 def serve_pedido():
     return FileResponse(os.path.join(BASE_DIR, "pedido.html"))
 
 @app.get("/admin.html")
+@app.get("/admin")
 def serve_admin():
     return FileResponse(os.path.join(BASE_DIR, "admin.html"))
 
 @app.get("/login.html")
+@app.get("/login")
 def serve_login():
     return FileResponse(os.path.join(BASE_DIR, "login.html"))
 
